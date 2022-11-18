@@ -1,34 +1,26 @@
 #include <glad/glad.h>
 #include <glfw3.h>
 #include "glad.c"
+#include "shader.h"
 
 #include <iostream>
 
 
+
 int main()
 {
-	const char* vertexShaderSource = "#version 330 core\n"
-		"layout (location = 0) in vec3 aPos;\n"
-		"void main()\n"
-		"{\n"
-			"gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
-		"}\0";
-
-	const char* fragmentShaderSource = "#version 330 core\n"
-		"out vec4 FragColor;\n"
-		"uniform vec4 u_Color;\n"
-		"void main()\n"
-		"{\n"
-			"FragColor = u_Color;\n"
-		"}\0";
-
 	//std::cout << fragmentShaderSource << std::endl;
-
 	glfwInit();
 	if (!glfwInit())
 	{
 		std::cout << "glfw not work proplery";
 	};
+
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+
+	//std::cout << VER_MAJORVERSION << "," << VER_MINORVERSION << std::endl;
 
 	GLFWwindow* window = glfwCreateWindow(600, 400, "For fun", NULL, NULL);
 	glfwMakeContextCurrent(window);
@@ -37,11 +29,15 @@ int main()
 		std::cout << "fails to show window";
 	};
 
+	
 	gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
 	{
 		std::cout << "Failed to intitalize glad" << std::endl;
 	};
+
+	
+	std::cout <<glGetString(GL_VERSION);
 
 	GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
 	glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
@@ -87,34 +83,50 @@ int main()
 		std::cout << "Error in Program" << plog << std::endl;
 	};
 
-	float vertices[9] =
+	float position1[18] =
 	{
-		0.0f,0.5f,0.0f,
-       -0.5f,0.0f,0.0f,
-		0.5f,0.0f,0.0f	
+		0.0f,0.90f,0.0f,	1.0f,0.0f,0.0f,
+	   -0.75f,-0.75f,0.0f,  0.0f,1.0f,0.0f,
+		0.75f,-0.75f,0.0f,  0.0f,0.0f,1.0f
 	};
 
-	GLuint buffer;
+	GLuint VAO;
+	glGenVertexArrays(1, &VAO);
+	glBindVertexArray(VAO);
+
+	GLuint buffer; //index;
 	glGenBuffers(1, &buffer);
 	glBindBuffer(GL_ARRAY_BUFFER, buffer);
-	glBufferData(GL_ARRAY_BUFFER, 9*sizeof(float),vertices, GL_STATIC_DRAW);	
+	glBufferData(GL_ARRAY_BUFFER, 18 * sizeof(float), position1, GL_STATIC_DRAW);
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3*sizeof(float), 0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), 0);
+
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1,3, GL_FLOAT, GL_FALSE, 6 * sizeof(float) ,(void*)12);
+	
+	//glGenBuffers(1, &index);
+	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, index);
+	//glBufferData(GL_ELEMENT_ARRAY_BUFFER, 6 * sizeof(GLuint),indices, GL_STATIC_DRAW);
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	glUseProgram(Program);
-	int UniformLocation = glGetUniformLocation(Program, "u_Color");
-	glUniform4f(UniformLocation,1.0f, 0.0f, 0.0f, 1.0f);
+
+
+	//float r = 0.0f;
+	//int UniformLocation = glGetUniformLocation(Program, "u_Color");
+	//glUniform4f(UniformLocation, r, 0.0f, 0.0f, 1.0f);
 
 	while (!glfwWindowShouldClose(window))
 	{	
 		glClear(GL_COLOR_BUFFER_BIT);
-		glClearColor(0.5f, 0.5f, 1.0f, 1.0f);
-		glDrawArrays(GL_TRIANGLES, 0, 3);
-		
+		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+		glDrawArrays(GL_TRIANGLES, 0,3);
+
+
 		glfwSwapBuffers(window);
 		glfwPollEvents();
+
 	};
 
 	glDeleteShader(vertexShader);
