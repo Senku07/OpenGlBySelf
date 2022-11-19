@@ -23,5 +23,8 @@
     <ClInclude Include="source\shader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="source\image.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
